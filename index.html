@@ -64,22 +64,80 @@
     <!-- PrimeVue 組件庫 -->
     <script src="./public/libs/primevue/primevue.min.js"></script>
     
+    <!-- 全局錯誤處理（必須在應用入口前載入） -->
+    <script type="module">
+        // 立即初始化錯誤處理器
+        import { initializeErrorHandler, initializeNetworkMonitor } from './src/utils/errorHandler.js';
+        
+        // 捕獲未處理的錯誤
+        initializeErrorHandler();
+        initializeNetworkMonitor();
+        
+        // 檢測必需的全局對象
+        window.addEventListener('DOMContentLoaded', () => {
+            const requiredLibs = {
+                'Vue': typeof Vue !== 'undefined',
+                'VueRouter': typeof VueRouter !== 'undefined',
+                'Pinia': typeof Pinia !== 'undefined',
+                'Dexie': typeof Dexie !== 'undefined',
+                'Decimal': typeof Decimal !== 'undefined',
+                'DOMPurify': typeof DOMPurify !== 'undefined'
+            };
+            
+            let allLoaded = true;
+            for (const [name, loaded] of Object.entries(requiredLibs)) {
+                if (!loaded) {
+                    console.error(`❌ 必需庫未載入: ${name}`);
+                    allLoaded = false;
+                } else {
+                    console.log(`✅ ${name} 已載入`);
+                }
+            }
+            
+            if (!allLoaded) {
+                document.getElementById('app').innerHTML = `
+                    <div style="padding: 40px; text-align: center; font-family: sans-serif;">
+                        <h2 style="color: #e74c3c;">⚠️ 系統載入失敗</h2>
+                        <p>部分必需庫未正確載入，請執行以下步驟：</p>
+                        <ol style="text-align: left; max-width: 500px; margin: 20px auto;">
+                            <li>執行：<code>python3 download_libs.py</code></li>
+                            <li>確認 <code>public/libs/</code> 目錄存在</li>
+                            <li>重新載入頁面</li>
+                        </ol>
+                    </div>
+                `;
+            }
+        });
+    </script>
+    
     <!-- 應用入口 -->
     <script type="module" src="./src/main.js"></script>
     
     <script>
-        // Service Worker 註冊
+        // Service Worker 註冊（靜默失敗，不阻止應用運行）
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./service-worker.js')
                     .then(reg => console.log('✅ Service Worker 註冊成功:', reg.scope))
-                    .catch(err => console.error('❌ Service Worker 註冊失敗:', err));
+                    .catch(err => {
+                        console.warn('⚠️ Service Worker 註冊失敗（離線功能可能受限）:', err.message);
+                        // 不阻止應用運行
+                    });
             });
         }
         
-        // PDF.js Worker 配置
+        // PDF.js Worker 配置（檢查後再配置）
         if (typeof pdfjsLib !== 'undefined') {
             pdfjsLib.GlobalWorkerOptions.workerSrc = './public/libs/pdf.worker.min.js';
+            console.log('✅ PDF.js Worker 已配置');
+        } else {
+            console.warn('⚠️ PDF.js 未載入（PDF 功能暫不可用）');
+        }
+        
+        // Day.js 語系配置
+        if (typeof dayjs !== 'undefined') {
+            dayjs.locale('zh-tw');
+            console.log('✅ Day.js 中文語系已設定');
         }
     </script>
 </body>
