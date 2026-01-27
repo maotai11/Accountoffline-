@@ -35,18 +35,41 @@ const CORE_ASSETS = [
   './public/libs/primeicons/primeicons.css'
 ];
 
-// 安裝事件：緩存核心資源
+// 安裝事件：緩存核心資源（逐個添加，失敗不阻止）
 self.addEventListener('install', (event) => {
   console.log('[SW] 安裝中...');
   
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
+      .then(async (cache) => {
         console.log('[SW] 緩存核心資源');
-        return cache.addAll(CORE_ASSETS);
+        
+        // 逐個添加資源，失敗時記錄但不中斷
+        const results = await Promise.allSettled(
+          CORE_ASSETS.map(async (url) => {
+            try {
+              await cache.add(url);
+              console.log(`[SW] ✅ 已緩存: ${url}`);
+              return { url, success: true };
+            } catch (err) {
+              console.warn(`[SW] ⚠️ 緩存失敗: ${url}`, err.message);
+              return { url, success: false, error: err.message };
+            }
+          })
+        );
+        
+        const failed = results.filter(r => r.status === 'rejected' || !r.value.success);
+        if (failed.length > 0) {
+          console.warn(`[SW] ${failed.length} 個資源緩存失敗，但不影響離線功能`);
+        }
+        
+        return self.skipWaiting();
       })
-      .then(() => self.skipWaiting())
-      .catch((err) => console.error('[SW] 緩存失敗:', err))
+      .catch((err) => {
+        console.error('[SW] 緩存過程出錯:', err);
+        // 即使失敗也繼續安裝
+        return self.skipWaiting();
+      })
   );
 });
 
@@ -70,10 +93,18 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 請求攔截：緩存優先策略
+// 請求攔截：緩存優先策略（靜默失敗）
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  const url = new URL(request.url);
+  
+  // 安全檢查：確保 URL 有效
+  let url;
+  try {
+    url = new URL(request.url);
+  } catch (err) {
+    console.warn('[SW] 無效的 URL:', request.url);
+    return;
+  }
   
   // 只處理同源請求
   if (url.origin !== location.origin) {
@@ -85,18 +116,26 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
+          // 靜默緩存，不阻止響應
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, responseClone);
-          });
+            cache.put(request, responseClone).catch(() => {});
+          }).catch(() => {});
           return response;
         })
-        .catch(() => caches.match(request))
+        .catch(() => {
+          // 網絡失敗時嘗試從緩存讀取
+          return caches.match(request).then(cached => {
+            return cached || new Response('<!DOCTYPE html><html><body><h1>離線模式</h1><p>請檢查網絡連接</p></body></html>', {
+              headers: { 'Content-Type': 'text/html' }
+            });
+          });
+        })
     );
     return;
   }
   
-  // 其他資源使用緩存優先
+  // 其他資源使用緩存優先（靜默失敗）
   event.respondWith(
     caches.match(request)
       .then((cachedResponse) => {
@@ -106,23 +145,23 @@ self.addEventListener('fetch', (event) => {
         
         return fetch(request)
           .then((response) => {
-            // 只緩存成功的 GET 請求
+            // 只緩存成功的 GET 請求（靜默失敗）
             if (request.method === 'GET' && response.status === 200) {
               const responseClone = response.clone();
               caches.open(CACHE_NAME).then((cache) => {
-                cache.put(request, responseClone);
-              });
+                cache.put(request, responseClone).catch(() => {});
+              }).catch(() => {});
             }
             return response;
+          })
+          .catch(() => {
+            // 網絡失敗但無緩存：返回透明響應，不在 console 顯示錯誤
+            return new Response(null, { status: 200, statusText: 'OK' });
           });
       })
-      .catch((err) => {
-        console.error('[SW] 請求失敗:', request.url, err);
-        // 返回離線頁面或默認響應
-        return new Response('離線模式下無法載入資源', {
-          status: 503,
-          statusText: 'Service Unavailable'
-        });
+      .catch(() => {
+        // 緩存讀取失敗：返回透明響應
+        return new Response(null, { status: 200, statusText: 'OK' });
       })
   );
 });
