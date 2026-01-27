@@ -46,14 +46,18 @@
     <!-- 數據持久化 -->
     <script src="./public/libs/dexie.min.js"></script>
     
-    <!-- PDF 處理 -->
-    <script src="./public/libs/pdf.min.js"></script>
+    <!-- PDF 生成與處理 -->
+    <script src="./public/libs/jspdf.umd.min.js"></script>
+    <script src="./public/libs/pdf-lib.min.js"></script>
+    <script src="./public/libs/pdfjs/pdf.min.js"></script>
     
     <!-- 文件處理 -->
     <script src="./public/libs/file-saver.min.js"></script>
     <script src="./public/libs/jszip.min.js"></script>
+    <script src="./public/libs/xlsx.full.min.js"></script>
     
     <!-- 圖表庫 -->
+    <script src="./public/libs/chart.umd.min.js"></script>
     <script src="./public/libs/echarts.min.js"></script>
     
     <!-- Vue 生態系統 -->
@@ -81,7 +85,9 @@
                 'Pinia': typeof Pinia !== 'undefined',
                 'Dexie': typeof Dexie !== 'undefined',
                 'Decimal': typeof Decimal !== 'undefined',
-                'DOMPurify': typeof DOMPurify !== 'undefined'
+                'DOMPurify': typeof DOMPurify !== 'undefined',
+                'jsPDF': typeof window.jspdf !== 'undefined',
+                'Chart.js': typeof Chart !== 'undefined'
             };
             
             let allLoaded = true;
@@ -127,11 +133,14 @@
         }
         
         // PDF.js Worker 配置（檢查後再配置）
-        if (typeof pdfjsLib !== 'undefined') {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = './public/libs/pdf.worker.min.js';
-            console.log('✅ PDF.js Worker 已配置');
+        if (typeof pdfjsLib !== 'undefined' || typeof window['pdfjs-dist/build/pdf'] !== 'undefined') {
+            const pdfjs = pdfjsLib || window['pdfjs-dist/build/pdf'];
+            if (pdfjs && pdfjs.GlobalWorkerOptions) {
+                pdfjs.GlobalWorkerOptions.workerSrc = './public/libs/pdfjs/pdf.worker.min.js';
+                console.log('✅ PDF.js Worker 已配置');
+            }
         } else {
-            console.warn('⚠️ PDF.js 未載入（PDF 功能暫不可用）');
+            console.warn('⚠️ PDF.js 未載入（PDF 解析功能暫不可用）');
         }
         
         // Day.js 語系配置
