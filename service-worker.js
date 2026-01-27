@@ -14,25 +14,39 @@ const CORE_ASSETS = [
   './src/assets/styles/theme.css',
   './src/assets/styles/utilities.css',
   
-  // 第三方庫
+  // Vue 生態系統
+  './public/libs/vue.global.prod.js',
+  './public/libs/vue-router.global.prod.js',
+  './public/libs/pinia.iife.prod.js',
+  
+  // PrimeVue 組件庫
+  './public/libs/primevue/primevue.min.js',
+  './public/libs/primevue/themes/lara-light-blue/theme.css',
+  './public/libs/primevue/core/core.min.css',
+  './public/libs/primeicons/primeicons.css',
+  
+  // 核心工具庫
   './public/libs/decimal.min.js',
   './public/libs/dayjs.min.js',
   './public/libs/dayjs-locale-zh-tw.min.js',
   './public/libs/lodash.min.js',
   './public/libs/dompurify.min.js',
   './public/libs/dexie.min.js',
-  './public/libs/pdf.min.js',
-  './public/libs/pdf.worker.min.js',
+  
+  // PDF 生成與處理
+  './public/libs/jspdf.umd.min.js',
+  './public/libs/pdf-lib.min.js',
+  './public/libs/pdfjs/pdf.min.js',
+  './public/libs/pdfjs/pdf.worker.min.js',
+  
+  // 圖表庫
+  './public/libs/chart.umd.min.js',
+  './public/libs/echarts.min.js',
+  
+  // 文件處理
   './public/libs/file-saver.min.js',
   './public/libs/jszip.min.js',
-  './public/libs/echarts.min.js',
-  './public/libs/vue.global.prod.js',
-  './public/libs/vue-router.global.prod.js',
-  './public/libs/pinia.iife.prod.js',
-  './public/libs/primevue/primevue.min.js',
-  './public/libs/primevue/themes/lara-light-blue/theme.css',
-  './public/libs/primevue/core/core.min.css',
-  './public/libs/primeicons/primeicons.css'
+  './public/libs/xlsx.full.min.js'
 ];
 
 // 安裝事件：緩存核心資源（逐個添加，失敗不阻止）
