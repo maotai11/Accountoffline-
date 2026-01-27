@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; 
+                   script-src 'self' 'unsafe-eval'; 
+                   style-src 'self' 'unsafe-inline'; 
+                   img-src 'self' data: blob:;
+                   font-src 'self' data:;">
+    <meta name="description" content="會計事務所內控作業系統 - 離線稅務計算與案件管理">
+    <title>會計事務所內控作業系統</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="./public/icons/favicon.svg">
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- PrimeVue CSS -->
+    <link rel="stylesheet" href="./public/libs/primevue/themes/lara-light-blue/theme.css">
+    <link rel="stylesheet" href="./public/libs/primevue/core/core.min.css">
+    <link rel="stylesheet" href="./public/libs/primeicons/primeicons.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="./src/assets/styles/variables.css">
+    <link rel="stylesheet" href="./src/assets/styles/main.css">
+    <link rel="stylesheet" href="./src/assets/styles/theme.css">
+    <link rel="stylesheet" href="./src/assets/styles/utilities.css">
+</head>
+<body>
+    <div id="app">
+        <div class="loading-screen">
+            <div class="loading-spinner"></div>
+            <p>系統載入中...</p>
+        </div>
+    </div>
+
+    <!-- 第三方庫（本地引用，按依賴順序載入） -->
+    <!-- 核心工具庫 -->
+    <script src="./public/libs/decimal.min.js"></script>
+    <script src="./public/libs/dayjs.min.js"></script>
+    <script src="./public/libs/dayjs-locale-zh-tw.min.js"></script>
+    <script src="./public/libs/lodash.min.js"></script>
+    <script src="./public/libs/dompurify.min.js"></script>
+    
+    <!-- 數據持久化 -->
+    <script src="./public/libs/dexie.min.js"></script>
+    
+    <!-- PDF 處理 -->
+    <script src="./public/libs/pdf.min.js"></script>
+    
+    <!-- 文件處理 -->
+    <script src="./public/libs/file-saver.min.js"></script>
+    <script src="./public/libs/jszip.min.js"></script>
+    
+    <!-- 圖表庫 -->
+    <script src="./public/libs/echarts.min.js"></script>
+    
+    <!-- Vue 生態系統 -->
+    <script src="./public/libs/vue.global.prod.js"></script>
+    <script src="./public/libs/vue-router.global.prod.js"></script>
+    <script src="./public/libs/pinia.iife.prod.js"></script>
+    
+    <!-- PrimeVue 組件庫 -->
+    <script src="./public/libs/primevue/primevue.min.js"></script>
+    
+    <!-- 應用入口 -->
+    <script type="module" src="./src/main.js"></script>
+    
+    <script>
+        // Service Worker 註冊
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('✅ Service Worker 註冊成功:', reg.scope))
+                    .catch(err => console.error('❌ Service Worker 註冊失敗:', err));
+            });
+        }
+        
+        // PDF.js Worker 配置
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = './public/libs/pdf.worker.min.js';
+        }
+    </script>
+</body>
+</html>
