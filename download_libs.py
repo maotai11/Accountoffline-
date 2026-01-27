@@ -21,16 +21,22 @@ LIBRARIES = {
     # 數據持久化
     'dexie.min.js': 'https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js',
     
-    # PDF 處理
-    'pdf.min.js': 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
-    'pdf.worker.min.js': 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js',
+    # PDF 生成與處理
+    'jspdf.umd.min.js': 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
+    'pdf-lib.min.js': 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js',
+    'pdfjs/pdf.min.js': 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
+    'pdfjs/pdf.worker.min.js': 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js',
     
     # 文件處理
     'file-saver.min.js': 'https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js',
     'jszip.min.js': 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',
     
     # 圖表庫
+    'chart.umd.min.js': 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
     'echarts.min.js': 'https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js',
+    
+    # Excel 處理
+    'xlsx.full.min.js': 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
     
     # Vue 生態系統
     'vue.global.prod.js': 'https://cdn.jsdelivr.net/npm/vue@3.4.15/dist/vue.global.prod.js',
