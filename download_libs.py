@@ -27,6 +27,9 @@ LIBRARIES = {
     'pdfjs/pdf.min.js': 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
     'pdfjs/pdf.worker.min.js': 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js',
     
+    # HTML 轉圖片/PDF
+    'html2canvas.min.js': 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
+    
     # 文件處理
     'file-saver.min.js': 'https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js',
     'jszip.min.js': 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',
@@ -51,6 +54,10 @@ LIBRARIES = {
     'primeicons/fonts/primeicons.woff2': 'https://cdn.jsdelivr.net/npm/primeicons@6.0.1/fonts/primeicons.woff2',
     'primeicons/fonts/primeicons.woff': 'https://cdn.jsdelivr.net/npm/primeicons@6.0.1/fonts/primeicons.woff',
     'primeicons/fonts/primeicons.ttf': 'https://cdn.jsdelivr.net/npm/primeicons@6.0.1/fonts/primeicons.ttf',
+    
+    # 中文字體（思源黑體 - Noto Sans TC）
+    'fonts/NotoSansTC-Regular.otf': 'https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/TraditionalChinese/NotoSansTC-Regular.otf',
+    'fonts/NotoSansTC-Bold.otf': 'https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/TraditionalChinese/NotoSansTC-Bold.otf',
 }
 
 def download_file(url, dest_path):
