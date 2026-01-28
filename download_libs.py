@@ -40,6 +40,7 @@ LIBRARIES = {
     
     # Excel 處理
     'xlsx.full.min.js': 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
+    'exceljs.min.js': 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js',
     
     # Vue 生態系統
     'vue.global.prod.js': 'https://cdn.jsdelivr.net/npm/vue@3.4.15/dist/vue.global.prod.js',
@@ -58,6 +59,17 @@ LIBRARIES = {
     # 中文字體（思源黑體 - Noto Sans TC）
     'fonts/NotoSansTC-Regular.otf': 'https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/TraditionalChinese/NotoSansTC-Regular.otf',
     'fonts/NotoSansTC-Bold.otf': 'https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/TraditionalChinese/NotoSansTC-Bold.otf',
+    
+    # OCR 引擎（PaddleOCR + ONNX Runtime）
+    'onnxruntime-web.min.js': 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.0/dist/ort.min.js',
+    'onnxruntime-web.wasm': 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.0/dist/ort-wasm.wasm',
+    'onnxruntime-web-simd.wasm': 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.0/dist/ort-wasm-simd.wasm',
+    'onnxruntime-web-threaded.wasm': 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.0/dist/ort-wasm-threaded.wasm',
+    
+    # PaddleOCR PP-OCRv5 模型（高精度印刷+手寫識別）
+    'ocr/models/ch_PP-OCRv5_det_infer.onnx': 'https://huggingface.co/jameslahm/ch_PP-OCRv5_det/resolve/main/model.onnx',
+    'ocr/models/ch_PP-OCRv5_rec_infer.onnx': 'https://huggingface.co/jameslahm/ch_PP-OCRv5_rec/resolve/main/model.onnx',
+    'ocr/models/ppocr_keys_v1.txt': 'https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/release/2.7/ppocr/utils/ppocr_keys_v1.txt',
 }
 
 def download_file(url, dest_path):
