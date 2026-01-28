@@ -1,156 +1,68 @@
 <template>
-  <div class="main-layout" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
+  <div class="main-layout">
     <!-- 側邊欄 -->
-    <aside class="sidebar" :class="{ 'collapsed': sidebarCollapsed }">
-      <div class="sidebar-header">
-        <div class="logo" v-if="!sidebarCollapsed">
-          <i class="pi pi-calculator"></i>
-          <span>會計內控系統</span>
-        </div>
-        <div class="logo-collapsed" v-else>
-          <i class="pi pi-calculator"></i>
-        </div>
-        <button 
-          class="toggle-btn" 
-          @click="toggleSidebar"
-          :title="sidebarCollapsed ? '展開側邊欄' : '收合側邊欄'"
-        >
-          <i :class="sidebarCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'"></i>
-        </button>
+    <aside class="sidebar">
+      <div class="logo">
+        <h1>📊 會計系統</h1>
       </div>
-
-      <nav class="sidebar-nav">
-        <ul class="nav-list">
-          <li 
-            v-for="item in menuItems" 
-            :key="item.path"
-            :class="{ 'active': isActive(item.path) }"
-          >
-            <a 
-              :href="`#${item.path}`" 
-              @click.prevent="navigate(item.path)"
-              :title="sidebarCollapsed ? item.label : ''"
-            >
-              <i :class="item.icon"></i>
-              <span v-if="!sidebarCollapsed">{{ item.label }}</span>
-              <span v-if="item.badge && !sidebarCollapsed" class="badge">{{ item.badge }}</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="user-info" v-if="!sidebarCollapsed">
-          <i class="pi pi-user"></i>
-          <span>{{ username }}</span>
-        </div>
-        <div class="user-info-collapsed" v-else>
-          <i class="pi pi-user"></i>
-        </div>
+      
+      <nav class="nav-menu">
+        <router-link to="/" class="nav-item" exact-active-class="active">
+          <i class="pi pi-home"></i>
+          <span>儀表板</span>
+        </router-link>
         
-        <button class="settings-btn" @click="openSettings" :title="sidebarCollapsed ? '設定' : ''">
+        <router-link to="/ocr-batch" class="nav-item" active-class="active">
+          <i class="pi pi-images"></i>
+          <span>OCR 批量識別</span>
+        </router-link>
+        
+        <router-link to="/invoice-manage" class="nav-item" active-class="active">
+          <i class="pi pi-file"></i>
+          <span>發票管理</span>
+        </router-link>
+        
+        <router-link to="/reports" class="nav-item" active-class="active">
+          <i class="pi pi-chart-bar"></i>
+          <span>報表分析</span>
+        </router-link>
+        
+        <router-link to="/settings" class="nav-item" active-class="active">
           <i class="pi pi-cog"></i>
-          <span v-if="!sidebarCollapsed">設定</span>
-        </button>
+          <span>系統設置</span>
+        </router-link>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <i class="pi pi-user"></i>
+          <span>管理員</span>
+        </div>
       </div>
     </aside>
-
+    
     <!-- 主內容區 -->
     <main class="main-content">
-      <!-- 頂部導航欄 -->
-      <header class="top-bar">
+      <header class="content-header">
         <div class="breadcrumb">
-          <span v-for="(crumb, index) in breadcrumbs" :key="index">
-            <a v-if="crumb.path" :href="`#${crumb.path}`" @click.prevent="navigate(crumb.path)">
-              {{ crumb.label }}
-            </a>
-            <span v-else>{{ crumb.label }}</span>
-            <i v-if="index < breadcrumbs.length - 1" class="pi pi-angle-right"></i>
-          </span>
+          <i class="pi pi-home"></i>
+          <span>/ {{ currentRouteName }}</span>
         </div>
-
-        <div class="top-bar-actions">
-          <!-- 搜尋 -->
-          <div class="search-box">
-            <i class="pi pi-search"></i>
-            <input 
-              type="text" 
-              v-model="searchQuery"
-              placeholder="搜尋..."
-              @keyup.enter="handleSearch"
-            />
-          </div>
-
-          <!-- 通知 -->
-          <button class="icon-btn" @click="showNotifications" title="通知">
+        
+        <div class="header-actions">
+          <button class="icon-btn" title="通知">
             <i class="pi pi-bell"></i>
-            <span v-if="notificationCount > 0" class="notification-badge">{{ notificationCount }}</span>
           </button>
-
-          <!-- 離線狀態 -->
-          <div class="status-indicator" :class="{ 'offline': !isOnline }">
-            <i :class="isOnline ? 'pi pi-wifi' : 'pi pi-exclamation-triangle'"></i>
-            <span>{{ isOnline ? '線上' : '離線' }}</span>
-          </div>
+          <button class="icon-btn" title="幫助">
+            <i class="pi pi-question-circle"></i>
+          </button>
         </div>
       </header>
-
-      <!-- 內容區域 -->
-      <div class="content-wrapper">
+      
+      <div class="content-body">
         <slot></slot>
       </div>
-
-      <!-- 頁腳 -->
-      <footer class="footer">
-        <div class="footer-content">
-          <span>&copy; 2025 會計事務所內控作業系統</span>
-          <span>版本 1.0.0</span>
-          <span>最後同步: {{ lastSyncTime }}</span>
-        </div>
-      </footer>
     </main>
-
-    <!-- 設定面板（Modal） -->
-    <div v-if="showSettingsModal" class="modal-overlay" @click.self="closeSettings">
-      <div class="modal-content settings-modal">
-        <div class="modal-header">
-          <h3><i class="pi pi-cog"></i> 系統設定</h3>
-          <button class="close-btn" @click="closeSettings">
-            <i class="pi pi-times"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="settings-section">
-            <h4>主題設定</h4>
-            <label>
-              <input type="radio" v-model="theme" value="light" @change="updateTheme" />
-              <span>淺色模式</span>
-            </label>
-            <label>
-              <input type="radio" v-model="theme" value="dark" @change="updateTheme" />
-              <span>深色模式</span>
-            </label>
-          </div>
-
-          <div class="settings-section">
-            <h4>語言設定</h4>
-            <select v-model="language" @change="updateLanguage">
-              <option value="zh-TW">繁體中文</option>
-              <option value="zh-CN">简体中文</option>
-              <option value="en">English</option>
-            </select>
-          </div>
-
-          <div class="settings-section">
-            <h4>快取管理</h4>
-            <button class="btn btn-secondary" @click="clearCache">
-              <i class="pi pi-trash"></i> 清除快取
-            </button>
-            <p class="help-text">清除所有本地緩存數據（不影響已保存的計算記錄）</p>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -158,157 +70,16 @@
 export default {
   name: 'MainLayout',
   
-  data() {
-    return {
-      sidebarCollapsed: false,
-      showSettingsModal: false,
-      searchQuery: '',
-      notificationCount: 0,
-      isOnline: navigator.onLine,
-      username: '使用者',
-      theme: 'light',
-      language: 'zh-TW',
-      lastSyncTime: new Date().toLocaleString('zh-TW'),
-      
-      menuItems: [
-        { path: '/', label: '儀表板', icon: 'pi pi-th-large' },
-        { path: '/calculations', label: '稅務計算', icon: 'pi pi-calculator', badge: null },
-        { path: '/withholding', label: '扣繳計算', icon: 'pi pi-percentage' },
-        { path: '/pit', label: '綜所稅', icon: 'pi pi-chart-line' },
-        { path: '/cit', label: '營所稅', icon: 'pi pi-building' },
-        { path: '/penalty', label: '滯納金', icon: 'pi pi-exclamation-circle' },
-        { path: '/ocr-batch', label: 'OCR 批量識別', icon: 'pi pi-images' },
-        { path: '/reports', label: '報表生成', icon: 'pi pi-file-pdf' },
-        { path: '/rules', label: '規則管理', icon: 'pi pi-book' },
-        { path: '/history', label: '計算歷史', icon: 'pi pi-history' }
-      ],
-      
-      breadcrumbs: [
-        { label: '首頁', path: '/' }
-      ]
-    };
-  },
-  
-  mounted() {
-    // 監聽網絡狀態
-    window.addEventListener('online', this.updateOnlineStatus);
-    window.addEventListener('offline', this.updateOnlineStatus);
-    
-    // 從 localStorage 讀取設定
-    this.loadSettings();
-    
-    // 定期更新同步時間
-    setInterval(() => {
-      this.lastSyncTime = new Date().toLocaleString('zh-TW');
-    }, 60000); // 每分鐘更新
-  },
-  
-  beforeUnmount() {
-    window.removeEventListener('online', this.updateOnlineStatus);
-    window.removeEventListener('offline', this.updateOnlineStatus);
-  },
-  
-  methods: {
-    toggleSidebar() {
-      this.sidebarCollapsed = !this.sidebarCollapsed;
-      localStorage.setItem('sidebarCollapsed', this.sidebarCollapsed);
-    },
-    
-    navigate(path) {
-      this.$router?.push(path);
-      this.updateBreadcrumbs(path);
-    },
-    
-    isActive(path) {
-      return this.$route?.path === path;
-    },
-    
-    updateBreadcrumbs(path) {
-      const item = this.menuItems.find(m => m.path === path);
-      if (item) {
-        this.breadcrumbs = [
-          { label: '首頁', path: '/' },
-          { label: item.label, path: null }
-        ];
-      }
-    },
-    
-    handleSearch() {
-      if (this.searchQuery.trim()) {
-        this.$emit('search', this.searchQuery);
-      }
-    },
-    
-    showNotifications() {
-      this.$emit('show-notifications');
-    },
-    
-    updateOnlineStatus() {
-      this.isOnline = navigator.onLine;
-    },
-    
-    openSettings() {
-      this.showSettingsModal = true;
-    },
-    
-    closeSettings() {
-      this.showSettingsModal = false;
-    },
-    
-    updateTheme() {
-      document.documentElement.setAttribute('data-theme', this.theme);
-      localStorage.setItem('theme', this.theme);
-    },
-    
-    updateLanguage() {
-      localStorage.setItem('language', this.language);
-      // 觸發語言切換事件
-      this.$emit('language-change', this.language);
-    },
-    
-    async clearCache() {
-      if (confirm('確定要清除所有快取嗎？此操作不可復原。')) {
-        try {
-          // 清除 Service Worker 快取
-          if ('caches' in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(cacheNames.map(name => caches.delete(name)));
-          }
-          
-          alert('快取已清除！頁面將重新載入。');
-          window.location.reload();
-        } catch (error) {
-          console.error('清除快取失敗:', error);
-          alert('清除快取失敗，請稍後再試。');
-        }
-      }
-    },
-    
-    loadSettings() {
-      // 讀取側邊欄狀態
-      const collapsed = localStorage.getItem('sidebarCollapsed');
-      if (collapsed !== null) {
-        this.sidebarCollapsed = collapsed === 'true';
-      }
-      
-      // 讀取主題
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        this.theme = savedTheme;
-        document.documentElement.setAttribute('data-theme', this.theme);
-      }
-      
-      // 讀取語言
-      const savedLanguage = localStorage.getItem('language');
-      if (savedLanguage) {
-        this.language = savedLanguage;
-      }
-      
-      // 讀取使用者名稱
-      const savedUsername = localStorage.getItem('username');
-      if (savedUsername) {
-        this.username = savedUsername;
-      }
+  computed: {
+    currentRouteName() {
+      const routeNames = {
+        '/': '儀表板',
+        '/ocr-batch': 'OCR 批量識別',
+        '/invoice-manage': '發票管理',
+        '/reports': '報表分析',
+        '/settings': '系統設置'
+      };
+      return routeNames[this.$route.path] || '未知頁面';
     }
   }
 };
@@ -318,417 +89,139 @@ export default {
 .main-layout {
   display: flex;
   height: 100vh;
-  overflow: hidden;
+  background: #f5f5f5;
 }
 
-/* 側邊欄 */
+/* 側邊欄樣式 */
 .sidebar {
-  width: 250px;
-  background: #2c3e50;
-  color: #ecf0f1;
+  width: 260px;
+  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+  color: white;
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease;
-  position: relative;
-  z-index: 1000;
-}
-
-.sidebar.collapsed {
-  width: 70px;
-}
-
-.sidebar-header {
-  padding: 1.5rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 1.25rem;
-  font-weight: bold;
+  padding: 30px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.logo i {
-  font-size: 1.5rem;
-  color: #3498db;
-}
-
-.logo-collapsed {
-  text-align: center;
-  width: 100%;
-}
-
-.logo-collapsed i {
-  font-size: 1.5rem;
-  color: #3498db;
-}
-
-.toggle-btn {
-  background: transparent;
-  border: none;
-  color: #ecf0f1;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-
-.toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* 導航 */
-.sidebar-nav {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem 0;
-}
-
-.nav-list {
-  list-style: none;
-  padding: 0;
+.logo h1 {
   margin: 0;
+  font-size: 20px;
+  font-weight: 600;
 }
 
-.nav-list li {
-  margin: 0.25rem 0;
+.nav-menu {
+  flex: 1;
+  padding: 20px 0;
+  overflow-y: auto;
 }
 
-.nav-list a {
+.nav-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: #ecf0f1;
+  padding: 12px 25px;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  transition: all 0.2s;
-  position: relative;
+  transition: all 0.3s;
+  border-left: 3px solid transparent;
 }
 
-.sidebar.collapsed .nav-list a {
-  justify-content: center;
-  padding: 0.75rem 0;
-}
-
-.nav-list a:hover {
+.nav-item:hover {
   background: rgba(255, 255, 255, 0.1);
-}
-
-.nav-list li.active a {
-  background: #3498db;
   color: white;
 }
 
-.nav-list a i {
-  font-size: 1.25rem;
-  min-width: 1.25rem;
-}
-
-.badge {
-  background: #e74c3c;
+.nav-item.active {
+  background: rgba(52, 152, 219, 0.2);
   color: white;
-  padding: 0.125rem 0.5rem;
-  border-radius: 10px;
-  font-size: 0.75rem;
-  margin-left: auto;
+  border-left-color: #3498db;
 }
 
-/* 側邊欄頁腳 */
+.nav-item i {
+  margin-right: 12px;
+  font-size: 18px;
+}
+
 .sidebar-footer {
+  padding: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1rem;
 }
 
-.user-info, .user-info-collapsed {
+.user-info {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
+  gap: 10px;
 }
 
-.user-info-collapsed {
-  justify-content: center;
-}
-
-.settings-btn {
-  width: 100%;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ecf0f1;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.settings-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #3498db;
-}
-
-/* 主內容區 */
+/* 主內容區樣式 */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #f5f7fa;
 }
 
-/* 頂部欄 */
-.top-bar {
+.content-header {
   background: white;
-  border-bottom: 1px solid #e0e6ed;
-  padding: 1rem 1.5rem;
+  padding: 15px 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  align-items: center;
 }
 
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #7f8c8d;
-  font-size: 0.875rem;
+  gap: 5px;
+  color: #666;
 }
 
-.breadcrumb a {
-  color: #3498db;
-  text-decoration: none;
-}
-
-.breadcrumb a:hover {
-  text-decoration: underline;
-}
-
-.top-bar-actions {
+.header-actions {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.search-box {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-box i {
-  position: absolute;
-  left: 0.75rem;
-  color: #95a5a6;
-}
-
-.search-box input {
-  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
-  border: 1px solid #e0e6ed;
-  border-radius: 20px;
-  font-size: 0.875rem;
-  width: 200px;
-  transition: width 0.3s, border-color 0.2s;
-}
-
-.search-box input:focus {
-  outline: none;
-  border-color: #3498db;
-  width: 250px;
+  gap: 10px;
 }
 
 .icon-btn {
-  position: relative;
-  background: transparent;
+  width: 40px;
+  height: 40px;
   border: none;
-  color: #7f8c8d;
-  font-size: 1.25rem;
+  background: transparent;
+  color: #666;
   cursor: pointer;
-  padding: 0.5rem;
   border-radius: 50%;
-  transition: all 0.2s;
+  transition: all 0.3s;
 }
 
 .icon-btn:hover {
-  background: #f0f3f7;
-  color: #2c3e50;
+  background: #f0f0f0;
+  color: #3498db;
 }
 
-.notification-badge {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: #e74c3c;
-  color: white;
-  font-size: 0.625rem;
-  padding: 0.125rem 0.375rem;
-  border-radius: 10px;
-}
-
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  background: #d4edda;
-  color: #155724;
-  font-size: 0.875rem;
-}
-
-.status-indicator.offline {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-/* 內容包裝器 */
-.content-wrapper {
+.content-body {
   flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem;
-}
-
-/* 頁腳 */
-.footer {
-  background: white;
-  border-top: 1px solid #e0e6ed;
-  padding: 1rem 1.5rem;
-  text-align: center;
-}
-
-.footer-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-  color: #7f8c8d;
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid #e0e6ed;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.modal-header h3 {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.close-btn {
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  color: #7f8c8d;
-  cursor: pointer;
-}
-
-.modal-body {
-  padding: 1.5rem;
+  padding: 30px;
   overflow-y: auto;
 }
 
-.settings-section {
-  margin-bottom: 1.5rem;
+/* 滾動條美化 */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.settings-section h4 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-.settings-section label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  cursor: pointer;
-}
-
-.settings-section select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #e0e6ed;
+::-webkit-scrollbar-thumb {
+  background: #888;
   border-radius: 4px;
-  font-size: 0.875rem;
 }
 
-.help-text {
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
-  color: #7f8c8d;
-}
-
-/* 響應式 */
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    z-index: 1001;
-    transform: translateX(-100%);
-  }
-  
-  .sidebar.collapsed {
-    transform: translateX(0);
-    width: 70px;
-  }
-  
-  .main-content {
-    width: 100%;
-  }
-  
-  .search-box input {
-    width: 150px;
-  }
-  
-  .search-box input:focus {
-    width: 180px;
-  }
-  
-  .footer-content {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 </style>
