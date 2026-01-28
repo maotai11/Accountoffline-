@@ -85,14 +85,16 @@
     <script src="./src/core/engines/ocr/InvoiceValidator.js"></script>
     <script src="./src/core/engines/ocr/ExcelImageExporter.js"></script>
     
-    <!-- 全局錯誤處理（必須在應用入口前載入） -->
-    <script type="module">
-        // 立即初始化錯誤處理器
-        import { initializeErrorHandler, initializeNetworkMonitor } from './src/utils/errorHandler.js';
+    <!-- 全局錯誤處理 -->
+    <script>
+        // 簡化版錯誤處理（無外部依賴）
+        window.addEventListener('error', (event) => {
+            console.error('🔴 全局錯誤:', event.error);
+        });
         
-        // 捕獲未處理的錯誤
-        initializeErrorHandler();
-        initializeNetworkMonitor();
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('🔴 未處理的 Promise 錯誤:', event.reason);
+        });
         
         // 檢測必需的全局對象
         window.addEventListener('DOMContentLoaded', () => {
