@@ -140,6 +140,35 @@
     </script>
     
     <!-- 應用入口 -->
+    
+    <!-- 依賴檢查腳本 -->
+    <script>
+        // 確保所有依賴載入完成
+        function checkDependencies() {
+            const required = ['Vue', 'VueRouter', 'Pinia', 'PrimeVue'];
+            const missing = required.filter(name => typeof window[name] === 'undefined');
+
+            if (missing.length > 0) {
+                console.error('❌ 缺少依賴:', missing);
+                document.querySelector('.loading-screen p').textContent = 
+                    '載入失敗：缺少 ' + missing.join(', ');
+                return false;
+            }
+
+            console.log('✅ 所有依賴已載入');
+            return true;
+        }
+
+        // 等待所有腳本載入
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (!checkDependencies()) {
+                    console.error('依賴檢查失敗，停止載入 main.js');
+                }
+            }, 100);
+        });
+    </script>
+
     <script type="module" src="./src/main.js"></script>
     
     <script>
