@@ -1,12 +1,115 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>會計系統</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>離線記帳系統 | 首頁</title>
+  <meta name="description" content="個人所得稅計算與發票 OCR 辨識工具">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+    }
+    h1 {
+      color: white;
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      text-decoration: none;
+      color: #333;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+    .card-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #667eea;
+    }
+    .card-desc {
+      color: #666;
+      line-height: 1.6;
+    }
+    .footer {
+      text-align: center;
+      color: white;
+      margin-top: 3rem;
+      opacity: 0.8;
+    }
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+  <div class="container">
+    <h1>💼 離線記帳系統</h1>
+
+    <div class="cards">
+      <a href="/record/" class="card">
+        <div class="card-icon">💰</div>
+        <div class="card-title">記帳管理</div>
+        <div class="card-desc">
+          個人所得稅、扣繳計算<br>
+          罰款計算與報表管理
+        </div>
+      </a>
+
+      <a href="/invoice/" class="card">
+        <div class="card-icon">📸</div>
+        <div class="card-title">發票 OCR</div>
+        <div class="card-desc">
+          發票掃描與辨識<br>
+          自動擷取交易資料
+        </div>
+      </a>
+    </div>
+
+    <div class="footer">
+      <p>🔒 完全離線運作 · 資料保存本機 · 隱私安全</p>
+    </div>
+  </div>
 </body>
 </html>
