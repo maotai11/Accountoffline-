@@ -1,39 +1,45 @@
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import path from 'path';
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { resolve } from 'path'
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
 
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
-
-  // 修復 MIME type 錯誤
-  assetsInclude: ['**/*.wasm'],
-
-  server: {
-    headers: {
-      // 允許 Wasm 模組載入
-      'Cross-Origin-Embedder-Policy': 'require-corp',
-      'Cross-Origin-Opener-Policy': 'same-origin',
-    },
-  },
-
+  // 多 entry point 配置
   build: {
-    target: 'esnext',
     rollupOptions: {
-      output: {
-        // 分離 Wasm 文件
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name.endsWith('.wasm')) {
-            return 'assets/wasm/[name]-[hash][extname]';
-          }
-          return 'assets/[name]-[hash][extname]';
-        },
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        invoice: resolve(__dirname, 'invoice/index.html'),
+        record: resolve(__dirname, 'record/index.html'),
       },
     },
   },
-});
+
+  // 優化配置
+  optimizeDeps: {
+    exclude: ['paddle-ocr-wasm'], // OCR Wasm 按需載入
+  },
+
+  // 確保 Wasm 正確載入
+  server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
+    fs: {
+      strict: false,
+    },
+  },
+
+  // 確保靜態資源正確處理
+  assetsInclude: ['**/*.wasm'],
+
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src'),
+      '@shared': resolve(__dirname, './shared'),
+    },
+  },
+})
