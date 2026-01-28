@@ -177,6 +177,7 @@ export default {
         { path: '/pit', label: '綜所稅', icon: 'pi pi-chart-line' },
         { path: '/cit', label: '營所稅', icon: 'pi pi-building' },
         { path: '/penalty', label: '滯納金', icon: 'pi pi-exclamation-circle' },
+        { path: '/ocr-batch', label: 'OCR 批量識別', icon: 'pi pi-images' },
         { path: '/reports', label: '報表生成', icon: 'pi pi-file-pdf' },
         { path: '/rules', label: '規則管理', icon: 'pi pi-book' },
         { path: '/history', label: '計算歷史', icon: 'pi pi-history' }
