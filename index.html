@@ -58,10 +58,14 @@
     <script src="./public/libs/file-saver.min.js"></script>
     <script src="./public/libs/jszip.min.js"></script>
     <script src="./public/libs/xlsx.full.min.js"></script>
+    <script src="./public/libs/exceljs.min.js"></script>
     
     <!-- 圖表庫 -->
     <script src="./public/libs/chart.umd.min.js"></script>
     <script src="./public/libs/echarts.min.js"></script>
+    
+    <!-- OCR 引擎（PaddleOCR + ONNX Runtime）-->
+    <script src="./public/libs/onnxruntime-web.min.js"></script>
     
     <!-- Vue 生態系統 -->
     <script src="./public/libs/vue.global.prod.js"></script>
@@ -70,6 +74,16 @@
     
     <!-- PrimeVue 組件庫 -->
     <script src="./public/libs/primevue/primevue.min.js"></script>
+    
+    <!-- OCR 核心模組（PaddleOCR 引擎）-->
+    <script src="./src/core/engines/ocr/PaddleOCREngine.js"></script>
+    <script src="./src/core/engines/ocr/OCRPreprocessor.js"></script>
+    <script src="./src/core/engines/ocr/InvoiceScanner.js"></script>
+    
+    <!-- OCR 智能驗證模組 -->
+    <script src="./src/core/engines/ocr/InvoiceFieldMapper.js"></script>
+    <script src="./src/core/engines/ocr/InvoiceValidator.js"></script>
+    <script src="./src/core/engines/ocr/ExcelImageExporter.js"></script>
     
     <!-- 全局錯誤處理（必須在應用入口前載入） -->
     <script type="module">
@@ -90,7 +104,11 @@
                 'Decimal': typeof Decimal !== 'undefined',
                 'DOMPurify': typeof DOMPurify !== 'undefined',
                 'jsPDF': typeof window.jspdf !== 'undefined',
-                'Chart.js': typeof Chart !== 'undefined'
+                'Chart.js': typeof Chart !== 'undefined',
+                'ONNX Runtime': typeof ort !== 'undefined',
+                'PaddleOCR': typeof PaddleOCREngine !== 'undefined',
+                'OCR Preprocessor': typeof OCRPreprocessor !== 'undefined',
+                'Invoice Scanner': typeof InvoiceScanner !== 'undefined'
             };
             
             let allLoaded = true;
