@@ -3,203 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" 
-          content="default-src 'self'; 
-                   script-src 'self' 'unsafe-eval'; 
-                   style-src 'self' 'unsafe-inline'; 
-                   img-src 'self' data: blob:;
-                   font-src 'self' data:;">
-    <meta name="description" content="會計事務所內控作業系統 - 離線稅務計算與案件管理">
-    <title>會計事務所內控作業系統</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="./public/icons/favicon.svg">
-    <link rel="manifest" href="./manifest.json">
-    
-    <!-- PrimeVue CSS -->
-    <link rel="stylesheet" href="./public/libs/primevue/themes/lara-light-blue/theme.css">
-    <link rel="stylesheet" href="./public/libs/primevue/core/core.min.css">
-    <link rel="stylesheet" href="./public/libs/primeicons/primeicons.css">
-    
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="./src/assets/styles/variables.css">
-    <link rel="stylesheet" href="./src/assets/styles/main.css">
-    <link rel="stylesheet" href="./src/assets/styles/theme.css">
-    <link rel="stylesheet" href="./src/assets/styles/utilities.css">
+    <title>Account Offline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        #app {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <div class="loading-screen">
-            <div class="loading-spinner"></div>
-            <p>系統載入中...</p>
-        </div>
-    </div>
-
-    <!-- 第三方庫（本地引用，按依賴順序載入） -->
-    <!-- 核心工具庫 -->
-    <script src="./public/libs/decimal.min.js"></script>
-    <script src="./public/libs/dayjs.min.js"></script>
-    <script src="./public/libs/dayjs-locale-zh-tw.min.js"></script>
-    <script src="./public/libs/lodash.min.js"></script>
-    <script src="./public/libs/dompurify.min.js"></script>
-    
-    <!-- 數據持久化 -->
-    <script src="./public/libs/dexie.min.js"></script>
-    
-    <!-- PDF 生成與處理 -->
-    <script src="./public/libs/jspdf.umd.min.js"></script>
-    <script src="./public/libs/pdf-lib.min.js"></script>
-    <script src="./public/libs/pdfjs/pdf.min.js"></script>
-    
-    <!-- HTML 轉圖片/PDF -->
-    <script src="./public/libs/html2canvas.min.js"></script>
-    
-    <!-- 文件處理 -->
-    <script src="./public/libs/file-saver.min.js"></script>
-    <script src="./public/libs/jszip.min.js"></script>
-    <script src="./public/libs/xlsx.full.min.js"></script>
-    <script src="./public/libs/exceljs.min.js"></script>
-    
-    <!-- 圖表庫 -->
-    <script src="./public/libs/chart.umd.min.js"></script>
-    <script src="./public/libs/echarts.min.js"></script>
-    
-    <!-- OCR 引擎（PaddleOCR + ONNX Runtime）-->
-    <script src="./public/libs/onnxruntime-web.min.js"></script>
-    
-    <!-- Vue 生態系統 -->
-    <script src="./public/libs/vue.global.prod.js"></script>
-    <script src="./public/libs/vue-router.global.prod.js"></script>
-    <script src="./public/libs/pinia.iife.prod.js"></script>
-    
-    <!-- PrimeVue 組件庫 -->
-    <script src="./public/libs/primevue/primevue.min.js"></script>
-    
-    <!-- OCR 核心模組（PaddleOCR 引擎）-->
-    <script src="./src/core/engines/ocr/PaddleOCREngine.js"></script>
-    <script src="./src/core/engines/ocr/OCRPreprocessor.js"></script>
-    <script src="./src/core/engines/ocr/InvoiceScanner.js"></script>
-    
-    <!-- OCR 智能驗證模組 -->
-    <script src="./src/core/engines/ocr/InvoiceFieldMapper.js"></script>
-    <script src="./src/core/engines/ocr/InvoiceValidator.js"></script>
-    <script src="./src/core/engines/ocr/ExcelImageExporter.js"></script>
-    
-    <!-- 全局錯誤處理 -->
-    <script>
-        // 簡化版錯誤處理（無外部依賴）
-        window.addEventListener('error', (event) => {
-            console.error('🔴 全局錯誤:', event.error);
-        });
-        
-        window.addEventListener('unhandledrejection', (event) => {
-            console.error('🔴 未處理的 Promise 錯誤:', event.reason);
-        });
-        
-        // 檢測必需的全局對象
-        window.addEventListener('DOMContentLoaded', () => {
-            const requiredLibs = {
-                'Vue': typeof Vue !== 'undefined',
-                'VueRouter': typeof VueRouter !== 'undefined',
-                'Pinia': typeof Pinia !== 'undefined',
-                'Dexie': typeof Dexie !== 'undefined',
-                'Decimal': typeof Decimal !== 'undefined',
-                'DOMPurify': typeof DOMPurify !== 'undefined',
-                'jsPDF': typeof window.jspdf !== 'undefined',
-                'Chart.js': typeof Chart !== 'undefined',
-                'ONNX Runtime': typeof ort !== 'undefined',
-                'PaddleOCR': typeof PaddleOCREngine !== 'undefined',
-                'OCR Preprocessor': typeof OCRPreprocessor !== 'undefined',
-                'Invoice Scanner': typeof InvoiceScanner !== 'undefined'
-            };
-            
-            let allLoaded = true;
-            for (const [name, loaded] of Object.entries(requiredLibs)) {
-                if (!loaded) {
-                    console.error(`❌ 必需庫未載入: ${name}`);
-                    allLoaded = false;
-                } else {
-                    console.log(`✅ ${name} 已載入`);
-                }
-            }
-            
-            if (!allLoaded) {
-                document.getElementById('app').innerHTML = `
-                    <div style="padding: 40px; text-align: center; font-family: sans-serif;">
-                        <h2 style="color: #e74c3c;">⚠️ 系統載入失敗</h2>
-                        <p>部分必需庫未正確載入，請執行以下步驟：</p>
-                        <ol style="text-align: left; max-width: 500px; margin: 20px auto;">
-                            <li>執行：<code>python3 download_libs.py</code></li>
-                            <li>確認 <code>public/libs/</code> 目錄存在</li>
-                            <li>重新載入頁面</li>
-                        </ol>
-                    </div>
-                `;
-            }
-        });
-    </script>
-    
-    <!-- 應用入口 -->
-    
-    <!-- 依賴檢查腳本 -->
-    <script>
-        // 確保所有依賴載入完成
-        function checkDependencies() {
-            const required = ['Vue', 'VueRouter', 'Pinia', 'PrimeVue'];
-            const missing = required.filter(name => typeof window[name] === 'undefined');
-
-            if (missing.length > 0) {
-                console.error('❌ 缺少依賴:', missing);
-                document.querySelector('.loading-screen p').textContent = 
-                    '載入失敗：缺少 ' + missing.join(', ');
-                return false;
-            }
-
-            console.log('✅ 所有依賴已載入');
-            return true;
-        }
-
-        // 等待所有腳本載入
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                if (!checkDependencies()) {
-                    console.error('依賴檢查失敗，停止載入 main.js');
-                }
-            }, 100);
-        });
-    </script>
-
-    <script type="module" src="./src/main.js"></script>
-    
-    <script>
-        // Service Worker 註冊（靜默失敗，不阻止應用運行）
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(reg => console.log('✅ Service Worker 註冊成功:', reg.scope))
-                    .catch(err => {
-                        console.warn('⚠️ Service Worker 註冊失敗（離線功能可能受限）:', err.message);
-                        // 不阻止應用運行
-                    });
-            });
-        }
-        
-        // PDF.js Worker 配置（檢查後再配置）
-        if (typeof pdfjsLib !== 'undefined' || typeof window['pdfjs-dist/build/pdf'] !== 'undefined') {
-            const pdfjs = pdfjsLib || window['pdfjs-dist/build/pdf'];
-            if (pdfjs && pdfjs.GlobalWorkerOptions) {
-                pdfjs.GlobalWorkerOptions.workerSrc = './public/libs/pdfjs/pdf.worker.min.js';
-                console.log('✅ PDF.js Worker 已配置');
-            }
-        } else {
-            console.warn('⚠️ PDF.js 未載入（PDF 解析功能暫不可用）');
-        }
-        
-        // Day.js 語系配置
-        if (typeof dayjs !== 'undefined') {
-            dayjs.locale('zh-tw');
-            console.log('✅ Day.js 中文語系已設定');
-        }
-    </script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
 </body>
 </html>
